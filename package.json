@@ -30,9 +30,11 @@
     "embla-carousel-react": "^8.0.4",
     "input-otp": "^1.2.4",
     "next": "14.2.3",
+    "next-themes": "^0.3.0",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
+    "sonner": "^1.4.41",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
