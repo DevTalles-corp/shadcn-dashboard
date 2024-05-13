@@ -42,6 +42,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { Payment } from "@/data/payments.data";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -56,6 +57,9 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [currentStatus, setCurrentStatus] = useState("all");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  const isDeleteVisible = Object.keys(rowSelection).length > 0;
 
   const table = useReactTable({
     data,
@@ -67,10 +71,12 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
   });
 
@@ -115,6 +121,26 @@ export function DataTable<TData, TValue>({
             </SelectGroup>
           </SelectContent>
         </Select>
+
+        {isDeleteVisible && (
+          <Button
+            className="ml-2"
+            variant="destructive"
+            onClick={() => {
+              // table.getSelectedRowModel().rows.forEach((row) => {
+              //   console.log(row.original);
+              // });
+
+              const ids = table.getSelectedRowModel().rows.map((row) => {
+                return (row.original as Payment).clientName;
+              });
+
+              console.log(ids);
+            }}
+          >
+            Delete
+          </Button>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -195,23 +221,30 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
 
-        <div className="flex items-center justify-end space-x-2 py-4 mx-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="space-x-2 py-4 mx-2">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+
+          <div className="flex items-center justify-end space-x-2 ">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>
