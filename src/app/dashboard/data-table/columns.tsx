@@ -183,6 +183,7 @@ export const columns: ColumnDef<Payment>[] = [
                 navigator.clipboard.writeText(payment.id);
                 toast("Payment ID copied to clipboard", {
                   position: "top-right",
+                  duration: 3000,
                 });
                 // toast({
                 //   description: "Payment ID copied to clipboard",
