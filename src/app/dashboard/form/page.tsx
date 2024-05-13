@@ -7,6 +7,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
+import { Switch } from "@/components/ui/switch";
+
 import {
   Form,
   FormControl,
@@ -26,14 +28,20 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "@radix-ui/react-icons";
 
-const formSchema = z.object({
-  username: z.string().min(2).max(20),
-  email: z.string().email(),
-  gender: z.enum(["male", "female"]),
-  dateOfBirth: z.date({
-    required_error: "A date of birth is required.",
-  }),
-});
+const formSchema = z
+  .object({
+    username: z.string().min(2).max(20),
+    email: z.string().email(),
+    gender: z.enum(["male", "female", "other"]),
+    dateOfBirth: z.date({
+      required_error: "A date of birth is required.",
+    }),
+    marketingEmails: z.boolean().default(false),
+  })
+  .refine((data) => data.marketingEmails === true, {
+    message: "You must agree to receive marketing emails.",
+    path: ["marketingEmails"],
+  });
 
 export default function Page() {
   // 1. Define your form.
@@ -44,6 +52,8 @@ export default function Page() {
       email: "",
     },
   });
+
+  // console.log(form);
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -57,7 +67,7 @@ export default function Page() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
           {/* Username */}
           <FormField
@@ -98,7 +108,7 @@ export default function Page() {
             name="gender"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel>Notify me about...</FormLabel>
+                <FormLabel>Gender</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
@@ -117,6 +127,13 @@ export default function Page() {
                         <RadioGroupItem value="female" />
                       </FormControl>
                       <FormLabel className="font-normal">Female</FormLabel>
+                    </FormItem>
+
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="other" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Other</FormLabel>
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
@@ -167,6 +184,28 @@ export default function Page() {
                   Your date of birth is used to calculate your age.
                 </FormDescription>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Marketing Emails - Switch */}
+          <FormField
+            control={form.control}
+            name="marketingEmails"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm col-span-1 sm:col-span-2 ">
+                <div className="space-y-0.5">
+                  <FormLabel>Marketing emails</FormLabel>
+                  <FormDescription>
+                    Receive emails about your account.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />
